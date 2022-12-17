@@ -1,0 +1,51 @@
+{% extends "blog/base.html" %}
+{% block content %}
+    <h1> Posts by {{ view.kwargs.username }} ({{ page_obj.paginator.count}})</h1>
+    {% for post in posts %}
+        <article class="media content-section">
+          <img src="{{post.author.profile.image.url}}" class="rounded-circle article-img">
+          <div class="media-body">
+            <div class="article-metadata">
+              <a class="mr-2" href={% url 'user-posts' post.author %}>{{ post.author }}</a>
+              <small class="text-muted">{{ post.date_posted }}</small>
+            </div>
+            <h2><a class="article-title" href="{% url 'post-detail' post.id%}">{{ post.title }}</a></h2>
+            <p class="article-content">{{ post.content }}</p>
+          </div>
+        </article>
+    {% endfor %}
+  {% if is_paginated %}
+    <div class="mb-2">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous%}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number}}" tabindex="-1">Previous</a>
+          </li>
+          {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">Previous</a>
+          </li>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range%}
+            {% if page_obj.number == num %}
+              <li class="page-item active"><a class="page-link" href="?page={{num}}">{{ num }}</a></li>
+            {% elif num == 1 or num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' or num == page_obj.paginator.num_pages %}
+            {% comment %} {% elif abs( num - page_obj.number ) < 3 %} THIS DOESN'T WORK {% endcomment %}
+              <li class="page-item"><a class="page-link" href="?page={{num}}">{{num}}</a></li>
+            {% endif %}
+          {% endfor %}
+          {% if page_obj.has_next%}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number}}" tabindex="-1">Next</a>
+          </li>
+          {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">Next</a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  {% endif %}
+{% endblock content %}
